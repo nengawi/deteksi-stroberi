@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ichigo Test - AI Strawberry Leaf Disease Detection</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        
+        /* Navbar Full-Width dengan Menu di Tengah */
+        .navbar-full {
+            background: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            padding: 12px 0;
+            margin-bottom: 2.5rem;
+        }
+        
+        .main-wrapper { max-width: 1050px; margin: 0 auto; }
+        
+        /* Hero Section Dasar */
+        .hero-section {
+            position: relative;
+            background-color: #2d6a4f;
+            background-size: cover;
+            background-position: center;
+            border-radius: 1.5rem;
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            overflow: hidden;
+            /* Transisi fade halus saat background diganti oleh JS */
+            transition: background-image 1.2s ease-in-out;
+        }
+
+        /* Kelas khusus untuk menjalankan animasi zoom tepat 1 kali saat gambar baru tampil */
+        .hero-zoom {
+            animation: singleZoom 4.5s ease-out forwards;
+        }
+
+        @keyframes singleZoom {
+            0% {
+                background-size: 100% auto;
+            }
+            100% {
+                background-size: 112% auto; /* Zoom masuk perlahan sebesar 12% */
+            }
+        }
+        
+        /* Lapisan gelap transparan di atas background */
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 1;
+            border-radius: 1.5rem;
+        }
+        
+        .hero-section > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-card { background: #fff; border-radius: 1.25rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: none; }
+        .upload-zone { border: 2px dashed #2d6a4f; background: #f4fcf7; border-radius: 1rem; padding: 2.5rem; cursor: pointer; position: relative; }
+        .file-input-hidden { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:10; }
+        .btn-custom { background-color: #2d6a4f; color: white; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; }
+        .btn-custom:hover { background-color: #1b4332; color: white; }
+
+        /* KELAS KARTU DENGAN EFEK HOVER */
+        .variety-card {
+            border: none;
+            border-radius: 1.25rem;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            border-top: 4px solid transparent;
+        }
+        .variety-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(45, 106, 79, 0.08);
+            border-top-color: #2d6a4f;
+        }
+        .card-img-wrapper {
+            position: relative;
+            height: 180px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border-radius: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar Full-Width dengan Logo di Kiri & Menu di Tengah -->
+    <nav class="navbar navbar-expand-lg navbar-full sticky-top">
+        <div class="container px-4 position-relative">
+            <a class="navbar-brand py-0 d-flex align-items-center position-absolute" href="/">
+                <img src="{{ url_for('static', filename='logo web.png') }}" alt="Logo" style="height: 55px; width: auto;" class="d-inline-block">
+            </a>
+            <button class="navbar-toggler border-0 ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav align-items-center gap-4">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}text-success fw-bold{% else %}text-dark fw-semibold{% endif %}" href="/">
+                            <i class="fa-solid fa-house me-1"></i> Beranda
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/info-penyakit' %}text-success fw-bold{% else %}text-dark fw-semibold{% endif %}" href="/info-penyakit">
+                            <i class="fa-solid fa-book-medical me-1"></i> Info Penyakit
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/jenis-stroberi' %}text-success fw-bold{% else %}text-dark fw-semibold{% endif %}" href="/jenis-stroberi">
+                            <i class="fa-solid fa-seedling me-1"></i> Jenis Stroberi
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/profil' %}text-success fw-bold{% else %}text-dark fw-semibold{% endif %}" href="/profil">
+                            <i class="fa-solid fa-user me-1"></i> Profil Peneliti
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Konten Utama -->
+    <div class="container main-wrapper py-3 px-3">
+        
+        <!-- Hero Section dengan Slideshow Background -->
+        <div class="hero-section shadow-sm">
+            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3">Sistem Cerdas Pertanian & Deep Learning GoogLeNet</span>
+            <h1 class="fw-bold display-5 mb-3">Deteksi Kesehatan Daun Stroberi<br><span class="text-success bg-white px-2 rounded">Cepat, Akurat, dan Real-Time</span></h1>
+            <p class="lead opacity-8 mb-4">Platform uji klinis daun stroberi berbasis kecerdasan buatan untuk mendeteksi anomali penyakit tanaman secara instan.</p>
+            <a href="#deteksi-section" class="btn btn-custom shadow"><i class="fa-solid fa-wand-magic-sparkles me-2"></i> Mulai Deteksi Sekarang</a>
+        </div>
+
+        <!-- SEKSI PANDUAN PENGGUNAAN DENGAN EFEK HOVER -->
+        <div class="mb-5">
+            <div class="text-center mb-5">
+                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold mb-2">Panduan Pengguna</span>
+                <h3 class="fw-bold text-dark">Cara Menggunakan Aplikasi Ichigo Test</h3>
+                <p class="text-muted small">Ikuti 3 langkah mudah berikut untuk melakukan analisis citra daun stroberi.</p>
+            </div>
+            
+            <div class="row g-4">
+                <!-- Kartu Langkah 1 -->
+                <div class="col-md-4">
+                    <div class="card variety-card p-4 h-100">
+                        <div class="card-img-wrapper mb-3 border text-center d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-cloud-arrow-up fa-3x text-success shadow-sm p-3 bg-white rounded-circle"></i>
+                        </div>
+                        <div class="flex-grow-1 d-flex flex-column">
+                            <div class="mb-2"><span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill fw-bold" style="font-size: 0.72rem;">LANGKAH 01</span></div>
+                            <h4 class="fw-bold text-dark mb-2" style="font-size: 1.25rem;">Unggah Foto Daun</h4>
+                            <p class="text-muted small mb-3" style="line-height: 1.6;">Siapkan foto atau ambil gambar daun stroberi berformat JPG/PNG dengan pencahayaan yang jelas dan fokus.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu Langkah 2 -->
+                <div class="col-md-4">
+                    <div class="card variety-card p-4 h-100">
+                        <div class="card-img-wrapper mb-3 border text-center d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-brain fa-3x text-success shadow-sm p-3 bg-white rounded-circle"></i>
+                        </div>
+                        <div class="flex-grow-1 d-flex flex-column">
+                            <div class="mb-2"><span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill fw-bold" style="font-size: 0.72rem;">LANGKAH 02</span></div>
+                            <h4 class="fw-bold text-dark mb-2" style="font-size: 1.25rem;">Analisis GoogLeNet</h4>
+                            <p class="text-muted small mb-3" style="line-height: 1.6;">Sistem model deep learning akan mengekstraksi parameter dan mengklasifikasikan kondisi daun secara otomatis.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu Langkah 3 -->
+                <div class="col-md-4">
+                    <div class="card variety-card p-4 h-100">
+                        <div class="card-img-wrapper mb-3 border text-center d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-square-poll-vertical fa-3x text-success shadow-sm p-3 bg-white rounded-circle"></i>
+                        </div>
+                        <div class="flex-grow-1 d-flex flex-column">
+                            <div class="mb-2"><span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill fw-bold" style="font-size: 0.72rem;">LANGKAH 03</span></div>
+                            <h4 class="fw-bold text-dark mb-2" style="font-size: 1.25rem;">Lihat Hasil & Solusi</h4>
+                            <p class="text-muted small mb-3" style="line-height: 1.6;">Hasil kelas penyakit terdeteksi, tingkat keyakinan (confidence), serta rincian probabilitas langsung tampil.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Upload (Form Deteksi) -->
+        <div class="card main-card p-4 p-md-5 mb-5" id="deteksi-section">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold text-dark">Mulai Uji Deteksi Citra</h3>
+                <p class="text-muted">Seret atau pilih berkas foto daun stroberi di bawah ini untuk memulai pengujian.</p>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                <div class="upload-zone text-center mb-4">
+                    <input class="file-input-hidden" type="file" name="file" accept="image/*" required onchange="previewImage(event)">
+                    <div id="upload-prompt">
+                        <i class="fa-solid fa-cloud-arrow-up fa-3x text-success mb-3"></i>
+                        <h6 class="fw-bold text-dark mb-1">Klik atau Seret Berkas Gambar Daun ke Sini</h6>
+                        <p class="text-muted small mb-0">Mendukung format: .JPG, .JPEG, .PNG</p>
+                    </div>
+                    <div id="preview-box" class="d-none">
+                        <img id="img-preview" src="#" alt="Preview" class="img-fluid rounded-3 mb-2 shadow-sm" style="max-height: 200px;">
+                        <p class="text-success fw-bold small mb-0" id="file-name"></p>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-custom btn-lg w-100 shadow-sm py-3">Mulai Analisis Citra</button>
+            </form>
+        </div>
+
+        <!-- Hasil Prediksi -->
+        {% if result %}
+        <div class="card main-card p-4 p-md-5 mb-5 border-top border-4 border-danger">
+            <h4 class="fw-bold mb-3">Hasil Analisis Model GoogLeNet</h4>
+            <div class="row align-items-center">
+                <div class="col-md-5 text-center mb-3 mb-md-0">
+                    <img src="{{ result.image_path }}" class="img-fluid rounded-3 border shadow-sm" style="max-height: 220px; width: 100%; object-fit: cover;">
+                </div>
+                <div class="col-md-7">
+                    <div class="p-3 bg-light rounded-3 border mb-3">
+                        <span class="small text-danger fw-bold text-uppercase">Kondisi Terdeteksi</span>
+                        <h3 class="fw-bold text-danger mb-0 text-uppercase">{{ result.prediction }}</h3>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center px-3 py-2 bg-white rounded border">
+                        <span class="text-muted fw-semibold">Tingkat Keyakinan:</span>
+                        <span class="badge bg-success fs-6 px-3 py-2">{{ result.confidence }}%</span>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="text-muted opacity-25 my-4">
+            <h5 class="fw-bold mb-3 text-dark fs-6">Distribusi Probabilitas Kelas:</h5>
+            {% for class_name, prob in result.probabilities.items() %}
+            <div class="mb-3">
+                <div class="d-flex justify-content-between small fw-semibold mb-1">
+                    <span class="text-secondary">{{ class_name }}</span>
+                    <span class="text-dark">{{ prob }}%</span>
+                </div>
+                <div class="progress rounded-pill bg-light border" style="height: 10px;">
+                    <div class="progress-bar bg-success rounded-pill" role="progressbar" style="width: {{ prob }}px;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Footer Profesional Rapi -->
+    <footer class="bg-white border-top pt-5 pb-3 mt-5">
+        <div class="container-fluid px-4 px-lg-5" style="max-width: 1200px;">
+            <div class="row g-4 justify-content-between mb-4">
+                <!-- Kolom 1: Identitas Web & Riset -->
+                <div class="col-lg-5">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ url_for('static', filename='logo web.png') }}" alt="Logo" style="height: 45px; width: auto;" class="me-2">
+                    </div>
+                    <p class="text-muted small mb-3" style="line-height: 1.7;">
+                        <strong>Ichigo Test</strong> merupakan platform sistem cerdas berbasis kecerdasan buatan arsitektur <em>GoogLeNet</em> untuk mendeteksi kesehatan dan anomali penyakit daun stroberi secara cepat, akurat, dan <em>real-time</em> guna membantu produktivitas petani.
+                    </p>
+                </div>
+
+                <!-- Kolom 2: Menu Navigasi Cepat -->
+                <div class="col-lg-3">
+                    <h6 class="fw-bold text-dark mb-3 text-uppercase fs-6">Navigasi Sistem</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-2"><a href="/" class="text-decoration-none text-muted d-flex align-items-center"><i class="fa-solid fa-house me-2 text-success" style="width: 16px;"></i> Beranda Utama</a></li>
+                        <li class="mb-2"><a href="/info-penyakit" class="text-decoration-none text-muted d-flex align-items-center"><i class="fa-solid fa-book-medical me-2 text-success" style="width: 16px;"></i> Ensiklopedia Penyakit</a></li>
+                        <li class="mb-2"><a href="/jenis-stroberi" class="text-decoration-none text-muted d-flex align-items-center"><i class="fa-solid fa-seedling me-2 text-success" style="width: 16px;"></i> Varietas Stroberi</a></li>
+                        <li class="mb-2"><a href="/profil" class="text-decoration-none text-muted d-flex align-items-center"><i class="fa-solid fa-user me-2 text-success" style="width: 16px;"></i> Profil Peneliti</a></li>
+                    </ul>
+                </div>
+
+                <!-- Kolom 3: Layanan Bantuan Riset -->
+                <div class="col-lg-3">
+                    <h6 class="fw-bold text-dark mb-3 text-uppercase fs-6">Dukungan Riset</h6>
+                    <div class="p-3 rounded-3 border bg-light mb-3 shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <i class="fa-brands fa-whatsapp text-success fa-2x me-3"></i>
+                            <div>
+                                <span class="d-block text-muted" style="font-size: 0.72rem;">KONSULTASI / BANTUAN</span>
+                                <a href="https://wa.me/" target="_blank" class="text-decoration-none fw-bold text-dark small">Hubungi Peneliti via WA</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-outline-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" class="btn btn-outline-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#" class="btn btn-outline-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;"><i class="fa-solid fa-graduation-cap"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="text-muted opacity-25 my-4">
+
+            <!-- Copyright & Informasi Akademik -->
+            <div class="row align-items-center justify-content-between small text-muted">
+                <div class="col-md-6 mb-2 mb-md-0">
+                    <p class="mb-0">&copy; 2026 <strong>Ichigo Test</strong> - Skripsi Teknik Informatika | Universitas Medan Area.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <span class="bg-light px-3 py-2 rounded-pill border d-inline-block">
+                        Dikembangkan oleh <strong>Putri Regina</strong>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+   <script>
+        const bgImages = [
+            "url('{{ url_for('static', filename='sw1.jpg') }}')",
+            "url('{{ url_for('static', filename='sw2.jpg') }}')",
+            "url('{{ url_for('static', filename='sw4.jpg') }}')",
+            "url('{{ url_for('static', filename='sw5.jpg') }}')",
+            "url('{{ url_for('static', filename='sw6.jpg') }}')",
+            "url('{{ url_for('static', filename='sw3.jpg') }}')"
+        ];
+
+        let currentIndex = 0;
+        const hero = document.querySelector('.hero-section');
+
+        if (hero) {
+            // Fungsi untuk mengganti gambar dan memicu ulang animasi zoom secara rapi
+            function changeBackground() {
+                // Hapus kelas animasi sebentar untuk mereset posisi zoom
+                hero.classList.remove('hero-zoom');
+                
+                // Ganti gambar latar belakang
+                hero.style.backgroundImage = bgImages[currentIndex];
+                
+                // Paksa browser membaca ulang (reflow) agar animasi bisa dipicu dari awal
+                void hero.offsetWidth;
+                
+                // Pasang kembali kelas animasi zoom
+                hero.classList.add('hero-zoom');
+
+                // Lanjut ke indeks gambar berikutnya
+                currentIndex = (currentIndex + 1) % bgImages.length;
+            }
+
+            // Jalankan saat pertama kali halaman dibuka
+            changeBackground();
+
+            // Ganti gambar otomatis setiap 4.5 detik
+            setInterval(changeBackground, 4500);
+        }
+
+        function previewImage(event) {
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('img-preview').src = e.target.result;
+                    document.getElementById('upload-prompt').classList.add('d-none');
+                    document.getElementById('preview-box').classList.remove('d-none');
+                    document.getElementById('file-name').textContent = input.files[0].name;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</body>
+</html>

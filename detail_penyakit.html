@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ disease.title }} - Detail Ensiklopedia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        
+        /* Navbar Full-Width dengan Menu di Tengah */
+        .navbar-full {
+            background: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            padding: 12px 0;
+            margin-bottom: 2.5rem;
+        }
+        
+        .main-wrapper { max-width: 950px; margin: 0 auto; }
+        
+        /* Kartu Konten Utama */
+        .content-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        .detail-img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar Full-Width dengan Logo di Kiri & Menu di Tengah -->
+    <nav class="navbar navbar-expand-lg navbar-full sticky-top">
+        <div class="container px-4 position-relative">
+            <a class="navbar-brand py-0 d-flex align-items-center position-absolute" href="/">
+                <img src="{{ url_for('static', filename='logo web.png') }}" alt="Logo" style="height: 55px; width: auto;" class="d-inline-block">
+            </a>
+            <button class="navbar-toggler border-0 ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav align-items-center gap-4">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}text-success fw-bold{% else %}text-dark fw-semibold{% endif %}" href="/">
+                            <i class="fa-solid fa-house me-1"></i> Beranda
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/info-penyakit' %}text-success fw-bold{% else %}text-dark fw-semibold{% endif %}" href="/info-penyakit">
+                            <i class="fa-solid fa-book-medical me-1"></i> Info Penyakit
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/jenis-stroberi' %}text-success fw-bold{% else %}text-dark fw-semibold{% endif %}" href="/jenis-stroberi">
+                            <i class="fa-solid fa-seedling me-1"></i> Jenis Stroberi
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/profil' %}text-success fw-bold{% else %}text-dark fw-semibold{% endif %}" href="/profil">
+                            <i class="fa-solid fa-user me-1"></i> Profil Peneliti
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-wrapper py-3 px-3 mb-5">
+        
+        <div class="card content-card p-4 p-md-5">
+            
+            <!-- Bagian Header Atas: Badge Kiri & Tombol Kembali di Kanan -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold">Ensiklopedia Patogen & Hama</span>
+                <a href="/info-penyakit" class="btn btn-outline-success rounded-pill px-4 fw-semibold btn-sm shadow-sm">
+                    <i class="fa-solid fa-arrow-left me-2"></i> Kembali ke Daftar Ensiklopedia
+                </a>
+            </div>
+
+            <!-- Bagian Judul dan Deskripsi Utama (Hanya 1 kali, bersih dari duplikat) -->
+            <div class="mb-4">
+                <h1 class="fw-bold text-dark display-6 mb-2">{{ disease.title }}</h1>
+                <p class="text-muted lead fs-6" style="line-height: 1.7;">{{ disease.desc }}</p>
+            </div>
+
+            <div class="mb-5 text-center bg-light p-2 rounded-4 border">
+                <img src="{{ url_for('static', filename=disease.detail_img) }}" alt="{{ disease.title }}" class="detail-img shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1595855759920-86582396756a?auto=format&fit=crop&w=1000&q=80'">
+            </div>
+
+            <div class="mb-4 p-4 rounded-4 bg-light border-start border-4 border-warning">
+                <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-triangle-exclamation text-warning me-2"></i>Ciri-Ciri dan Analisis Gejala Serangan</h4>
+                <p class="text-secondary mb-3" style="line-height: 1.9; text-align: justify;">
+                    {{ disease.symptom }}
+                </p>
+                <p class="text-secondary mb-0" style="line-height: 1.9; text-align: justify;">
+                    Identifikasi visual secara cermat sangat diperlukan pada fase awal kemunculan gejala agar penanganan dapat dilakukan sebelum tingkat kerusakan menyebar ke jaringan organ vegetatif maupun generatif tanaman stroberi secara menyeluruh.
+                </p>
+            </div>
+
+            <div class="p-4 rounded-4 bg-success-subtle border-start border-4 border-success">
+                <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-shield-halved text-success me-2"></i>Solusi, Pencegahan & Protokol Pengendalian</h4>
+                <p class="text-secondary mb-3" style="line-height: 1.9; text-align: justify;">
+                    Untuk menekan laju perkembangan patogen atau populasi hama ini secara efektif, pendekatan terpadu harus diterapkan meliputi sanitasi lingkungan kebun, pengaturan iklim mikro, serta penerapan proteksi kimiawi atau hayati yang tepat sasaran:
+                </p>
+                <p class="text-secondary mb-0" style="line-height: 1.9; white-space: pre-line; text-align: justify;">
+                    {{ disease.control }}
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Footer Profesional Rapi -->
+    <footer class="bg-white border-top pt-5 pb-3 mt-5">
+        <div class="container-fluid px-4 px-lg-5" style="max-width: 1200px;">
+            <div class="row g-4 justify-content-between mb-4">
+                <div class="col-lg-5">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ url_for('static', filename='logo web.png') }}" alt="Logo" style="height: 45px; width: auto;" class="me-2">
+                    </div>
+                    <p class="text-muted small mb-3" style="line-height: 1.7;">
+                        <strong>Ichigo Test</strong> merupakan platform sistem cerdas berbasis kecerdasan buatan arsitektur <em>GoogLeNet</em> untuk mendeteksi kesehatan dan anomali penyakit daun stroberi secara cepat, akurat, dan <em>real-time</em> guna membantu produktivitas petani.
+                    </p>
+                </div>
+
+                <div class="col-lg-3">
+                    <h6 class="fw-bold text-dark mb-3 text-uppercase fs-6">Navigasi Sistem</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-2"><a href="/" class="text-decoration-none text-muted d-flex align-items-center"><i class="fa-solid fa-house me-2 text-success" style="width: 16px;"></i> Beranda Utama</a></li>
+                        <li class="mb-2"><a href="/info-penyakit" class="text-decoration-none text-muted d-flex align-items-center"><i class="fa-solid fa-book-medical me-2 text-success" style="width: 16px;"></i> Ensiklopedia Penyakit</a></li>
+                        <li class="mb-2"><a href="/jenis-stroberi" class="text-decoration-none text-muted d-flex align-items-center"><i class="fa-solid fa-seedling me-2 text-success" style="width: 16px;"></i> Varietas Stroberi</a></li>
+                        <li class="mb-2"><a href="/profil" class="text-decoration-none text-muted d-flex align-items-center"><i class="fa-solid fa-user me-2 text-success" style="width: 16px;"></i> Profil Peneliti</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3">
+                    <h6 class="fw-bold text-dark mb-3 text-uppercase fs-6">Dukungan Riset</h6>
+                    <div class="p-3 rounded-3 border bg-light mb-3 shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <i class="fa-brands fa-whatsapp text-success fa-2x me-3"></i>
+                            <div>
+                                <span class="d-block text-muted" style="font-size: 0.72rem;">KONSULTASI / BANTUAN</span>
+                                <a href="https://wa.me/" target="_blank" class="text-decoration-none fw-bold text-dark small">Hubungi Peneliti via WA</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="text-muted opacity-25 my-4">
+
+            <div class="row align-items-center justify-content-between small text-muted">
+                <div class="col-md-6 mb-2 mb-md-0">
+                    <p class="mb-0">&copy; 2026 <strong>Ichigo Test</strong> - Skripsi Teknik Informatika | Universitas Medan Area.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <span class="bg-light px-3 py-2 rounded-pill border d-inline-block">
+                        Dikembangkan oleh <strong>Putri Regina</strong>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
